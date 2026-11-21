@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Wayfarer | Travel Planner</title>
+<style>
+:root{--green:#246b57;--dark:#183e34;--mint:#eaf3ed;--paper:#f7f8f4;--ink:#20332e;--muted:#718079;--line:#e1e9e2}
+*{box-sizing:border-box}body{margin:0;font-family:Arial, sans-serif;background:var(--paper);color:var(--ink)}
+header{height:68px;padding:0 7%;display:flex;align-items:center;justify-content:space-between;background:white;border-bottom:1px solid var(--line)}
+.logo{font-size:23px;font-weight:800;letter-spacing:-1px}.logo span{color:var(--green)}
+nav{display:flex;gap:24px}nav a{color:var(--muted);text-decoration:none;font-size:14px}
+button{cursor:pointer;border:0;border-radius:9px;padding:11px 15px;font-weight:700}
+.primary{background:var(--green);color:white}.secondary{background:var(--mint);color:var(--green)}
+.hero{padding:55px 7%;display:grid;grid-template-columns:1.1fr .9fr;gap:35px;align-items:center;background:linear-gradient(110deg,#e5f0e8,#f7f8f4)}
+.eyebrow{color:var(--green);font-size:11px;font-weight:bold;letter-spacing:2px;text-transform:uppercase}
+h1{font-size:clamp(38px,5vw,58px);line-height:1.05;letter-spacing:-2px;margin:13px 0}
+.hero p{max-width:520px;color:var(--muted);line-height:1.7}
+.art{height:245px;border-radius:22px;background:linear-gradient(150deg,#b9d2c3,#578574);position:relative;overflow:hidden}
+.sun{position:absolute;width:70px;height:70px;border-radius:50%;background:#f5cb91;right:18%;top:15%}
+.mountain{position:absolute;bottom:-35px;width:0;height:0;border-left:170px solid transparent;border-right:170px solid transparent;border-bottom:220px solid #315e50;left:18%}
+.mountain.back{left:-45px;border-left-width:130px;border-right-width:130px;border-bottom-width:170px;border-bottom-color:#80a792}
+.art-label{position:absolute;bottom:17px;left:18px;background:#ffffffdf;padding:10px 13px;border-radius:9px;font-weight:bold}
+main{padding:42px 7% 70px}.heading{margin-bottom:20px}.heading h2{margin:7px 0;font-size:28px}.heading p{color:var(--muted);margin:0}
+.layout{display:grid;grid-template-columns:320px 1fr;gap:22px;align-items:start}
+.card{background:white;border:1px solid var(--line);border-radius:15px;padding:21px;box-shadow:0 8px 24px #183e3408}
+.card h3{margin:0 0 18px;font-size:18px}
+label{display:block;font-size:11px;font-weight:bold;color:#52665d;margin:0 0 7px}
+.field{margin-bottom:14px}input,select{width:100%;padding:11px;border:1px solid var(--line);border-radius:8px;background:#fbfcfa;font:inherit;color:var(--ink)}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:10px}.buttons{display:flex;gap:8px;flex-wrap:wrap}
+.note{font-size:12px;line-height:1.5;color:var(--muted)}
+.result-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}.result-head h3{margin:0}.badge{background:var(--mint);color:var(--green);font-size:10px;font-weight:bold;padding:7px 10px;border-radius:20px}
+.summary{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin-bottom:13px}
+.tile{background:white;border:1px solid var(--line);border-radius:10px;padding:12px}.tile small{display:block;color:var(--muted);text-transform:uppercase;font-size:10px;font-weight:bold}.tile strong{display:block;margin-top:5px}
+.day{background:white;border:1px solid var(--line);border-radius:12px;margin-bottom:12px;overflow:hidden}
+.day-title{background:#eef5ef;padding:12px 15px;font-weight:bold;font-size:14px}
+.stop{display:grid;grid-template-columns:75px 1fr auto;gap:10px;align-items:center;padding:13px 15px;border-top:1px solid #edf1ed}
+.time{font-size:11px;color:var(--green);font-weight:bold}.stop strong{font-size:13px}.stop small{display:block;color:var(--muted);font-size:11px;margin-top:4px;line-height:1.4}
+.map{font-size:11px;color:var(--green);text-decoration:none;border:1px solid #d7e7dc;padding:7px 8px;border-radius:7px;white-space:nowrap}
+.empty{min-height:230px;border:1px dashed #cbd8ce;border-radius:12px;display:grid;place-content:center;text-align:center;padding:25px;color:var(--muted)}
+.budget{margin-top:22px}.budget-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:12px}
+.total{margin-top:12px;padding:16px;background:var(--dark);color:white;border-radius:10px;display:flex;justify-content:space-between;gap:15px}
+.total span{font-size:12px;color:#d5e7dc}.total strong{display:block;font-size:23px;margin-top:4px}
+.checklist{margin-top:22px}.checks{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.checks label{display:flex;align-items:center;gap:7px;background:#f6faf6;padding:10px;border-radius:8px;font-size:12px;font-weight:normal;color:var(--ink)}.checks input{width:auto}
+footer{padding:22px 7%;border-top:1px solid var(--line);font-size:12px;color:var(--muted);display:flex;justify-content:space-between}
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--dark);color:white;padding:11px 16px;border-radius:9px;opacity:0;transition:.2s}.toast.show{opacity:1}
+
+/* Opening screen: a short branded welcome animation */
+.intro-screen{position:fixed;inset:0;z-index:1000;display:grid;place-items:center;
+  background:radial-gradient(circle at 50% 38%,#315f50 0%,#1d493d 42%,#142f29 100%);
+  color:#fff;transition:opacity .7s ease,visibility .7s ease}
+.intro-screen.hide{opacity:0;visibility:hidden;pointer-events:none}
+.intro-content{text-align:center;animation:introRise .9s ease both}
+.intro-mark{width:76px;height:76px;margin:0 auto 22px;position:relative;display:grid;place-items:center}
+.compass-ring{position:absolute;inset:5px;border:1px solid #c4dfcf;border-radius:50%;
+  box-shadow:0 0 28px #b5ddc533;animation:compassTurn 9s linear infinite}
+.compass-ring:before,.compass-ring:after{content:"";position:absolute;background:#c4dfcf}
+.compass-ring:before{width:1px;height:88px;left:50%;top:-7px;opacity:.45}
+.compass-ring:after{height:1px;width:88px;top:50%;left:-7px;opacity:.45}
+.compass-needle{width:0;height:0;border-left:8px solid transparent;border-right:8px solid transparent;
+  border-bottom:27px solid #e8c18d;transform:translateY(-5px)}
+.compass-dot{position:absolute;width:7px;height:7px;border-radius:50%;background:#fff}
+.intro-logo{font-size:42px;font-weight:800;letter-spacing:-2px}
+.intro-logo span{color:#e8c18d}
+.intro-tagline{margin:8px 0 28px;color:#d5e6dc;font-size:13px;letter-spacing:2px}
+.intro-loader{height:2px;width:150px;margin:0 auto 15px;background:#ffffff30;overflow:hidden;border-radius:5px}
+.intro-loader span{display:block;height:100%;width:40%;background:#e8c18d;animation:loadingLine 1.5s ease-in-out forwards}
+.intro-content small{font-size:9px;letter-spacing:2px;color:#b8d0c2}
+@keyframes introRise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+@keyframes compassTurn{to{transform:rotate(360deg)}}
+@keyframes loadingLine{from{transform:translateX(-110%)}to{transform:translateX(260%)}}
+@media(prefers-reduced-motion:reduce){.intro-content,.compass-ring,.intro-loader span{animation:none}.intro-screen{transition:none}}
+\n@media(max-width:850px){.hero{grid-template-columns:1fr}.layout{grid-template-columns:1fr}nav{display:none}.budget-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:560px){header,main,.hero,footer{padding-left:5%;padding-right:5%}.summary,.checks{grid-template-columns:1fr 1fr}.stop{grid-template-columns:55px 1fr}.map{grid-column:2;width:max-content}.total{flex-direction:column}.budget-grid{grid-template-columns:1fr 1fr}}
+</style>
+</head>
+<body>
+<header>
+  <div class="logo">wayfarer<span>.</span></div>
+  <nav><a href="#home">Home</a><a href="#planner">Plan a trip</a><a href="#itinerary">Itinerary</a><a href="#budget">Budget</a></nav>
+  <button class="primary" onclick="document.querySelector('#planner').scrollIntoView({behavior:'smooth'})">Start planning</button>
+</header>
+
+<section class="hero" id="home">
+  <div>
+    <div class="eyebrow">Your next adventure starts here</div>
+    <h1>Less planning.<br>More <span style="color:var(--green)">exploring.</span></h1>
+    <p>Plan your trip, get a simple day-wise itinerary and estimate your travel expenses — all in one place.</p>
+    <button class="primary" onclick="document.querySelector('#planner').scrollIntoView({behavior:'smooth'})">Plan my trip →</button>
+  </div>
+  <div class="art"><div class="sun"></div><div class="mountain back"></div><div class="mountain"></div><div class="art-label">Find your own way.</div></div>
+</section>
+
+<main>
+  <section id="planner">
+    <div class="heading"><div class="eyebrow">Make it yours</div><h2>Plan your getaway</h2><p>Enter a few details to create a suggested travel plan.</p></div>
+    <div class="layout">
+      <section class="card">
+        <h3>Trip details</h3>
+        <div class="field"><label for="destination">DESTINATION</label><input id="destination" placeholder="e.g. Manali, Jaipur, Goa"></div>
+        <div class="row">
+          <div class="field"><label for="start">START DATE</label><input id="start" type="date"></div>
+          <div class="field"><label for="days">DAYS</label><select id="days"><option>1</option><option>2</option><option selected>3</option><option>4</option><option>5</option><option>6</option><option>7</option></select></div>
+        </div>
+        <div class="field"><label for="style">TRAVEL STYLE</label><select id="style"><option value="balanced">A bit of everything</option><option value="nature">Nature & outdoors</option><option value="culture">Culture & history</option><option value="relaxed">Relaxed & slow</option></select></div>
+        <div class="buttons"><button class="primary" id="generate">Generate plan</button><button class="secondary" id="save">Save trip</button><button class="secondary" id="clear">Clear</button></div>
+        <p class="note">The itinerary is a sample schedule. Use the map links to search for real attractions at your destination.</p>
+      </section>
+
+      <section id="itinerary">
+        <div class="result-head"><h3>Your itinerary</h3><span class="badge" id="status">NOT CREATED</span></div>
+        <div class="summary" id="summary" hidden>
+          <div class="tile"><small>Destination</small><strong id="sumDestination">—</strong></div>
+          <div class="tile"><small>Trip length</small><strong id="sumDays">—</strong></div>
+          <div class="tile"><small>Planned stops</small><strong id="sumStops">—</strong></div>
+        </div>
+        <div id="output" class="empty">🧭<br><strong>Your trip starts with an idea.</strong><p>Enter your destination and click Generate plan.</p></div>
+      </section>
+    </div>
+  </section>
+
+  <section class="card budget" id="budget">
+    <h3>Travel budget calculator</h3>
+    <div class="budget-grid">
+      <div class="field"><label for="transport">TRANSPORT (₹)</label><input class="cost" id="transport" type="number" min="0" value="1500"></div>
+      <div class="field"><label for="stay">ACCOMMODATION (₹)</label><input class="cost" id="stay" type="number" min="0" value="2400"></div>
+      <div class="field"><label for="food">FOOD (₹)</label><input class="cost" id="food" type="number" min="0" value="1200"></div>
+      <div class="field"><label for="activities">ACTIVITIES (₹)</label><input class="cost" id="activities" type="number" min="0" value="800"></div>
+      <div class="field"><label for="misc">OTHER (₹)</label><input class="cost" id="misc" type="number" min="0" value="500"></div>
+    </div>
+    <div class="row">
+      <div class="field"><label for="travellers">NUMBER OF TRAVELLERS</label><input id="travellers" type="number" min="1" value="1"></div>
+      <div class="field"><label for="buffer">EXTRA BUFFER (%)</label><input id="buffer" type="number" min="0" value="10"></div>
+    </div>
+    <div class="total"><div><span>Estimated total</span><strong id="total">₹7,040</strong></div><div><span>Cost per person</span><strong id="perPerson">₹7,040</strong></div></div>
+    <p class="note">This is an estimate based on the amounts entered, not a live travel quote.</p>
+  </section>
+
+  <section class="card checklist">
+    <h3>Before-you-go checklist</h3>
+    <p class="note">Tick each item when it is ready.</p>
+    <div class="checks">
+      <label><input type="checkbox"> ID and documents</label><label><input type="checkbox"> Tickets booked</label><label><input type="checkbox"> Stay confirmed</label>
+      <label><input type="checkbox"> Chargers packed</label><label><input type="checkbox"> Essentials packed</label><label><input type="checkbox"> Cash / payment ready</label>
+    </div>
+  </section>
+</main>
+<footer><span>wayfarer. · Travel Planner</span><span>A simple student project prototype</span></footer>
+<div class="toast" id="toast"></div>
+
+<script>
+const $ = id => document.getElementById(id);
+
+// Each travel style contains sample activities for one day.
+const activities = {
+  balanced: [
+    ["09:00 AM","Explore the local area","Get familiar with the destination."],
+    ["12:30 PM","Try local food","Enjoy a popular local meal."],
+    ["03:00 PM","Visit a popular attraction","Explore a well-known place."],
+    ["06:00 PM","Evening walk","Enjoy the surroundings."]
+  ],
+  nature: [
+    ["08:00 AM","Nature trail","Explore a nearby green space."],
+    ["12:00 PM","Outdoor lunch","Take a break and enjoy the scenery."],
+    ["03:00 PM","Scenic viewpoint","Visit a viewpoint, lake or garden."],
+    ["06:00 PM","Sunset time","Enjoy the evening outdoors."]
+  ],
+  culture: [
+    ["09:00 AM","Historic landmark","Learn about local history."],
+    ["12:00 PM","Local cuisine","Try a traditional dish."],
+    ["02:00 PM","Museum or gallery","Explore local art and culture."],
+    ["05:00 PM","Market visit","Browse local shops and crafts."]
+  ],
+  relaxed: [
+    ["09:00 AM","Easy breakfast","Start the day without rushing."],
+    ["11:00 AM","Gentle exploration","Visit one nearby attraction."],
+    ["01:30 PM","Long lunch","Enjoy a relaxed meal."],
+    ["04:00 PM","Free time","Rest or explore at your own pace."]
+  ]
+};
+
+let trip = [];
+
+function showMessage(message) {
+  const toast = $("toast");
+  toast.textContent = message;
+  toast.classList.add("show");
+  setTimeout(() => toast.classList.remove("show"), 2000);
+}
+
+// Creates one day object for every day selected by the user.
+function generatePlan() {
+  const destination = $("destination").value.trim();
+  if (!destination) {
+    showMessage("Please enter a destination.");
+    $("destination").focus();
+    return;
+  }
+
+  const numberOfDays = Number($("days").value);
+  const style = $("style").value;
+  trip = [];
+
+  for (let day = 0; day < numberOfDays; day++) {
+    trip.push({ activities: activities[style] });
+  }
+  displayPlan(destination);
+  showMessage("Your sample itinerary is ready!");
+}
+
+// Displays the trip data on the webpage.
+function displayPlan(destination) {
+  const output = $("output");
+  output.className = "";
+  output.innerHTML = "";
+  let stopCount = 0;
+
+  trip.forEach((day, index) => {
+    const dayBox = document.createElement("div");
+    dayBox.className = "day";
+    const heading = document.createElement("div");
+    heading.className = "day-title";
+    heading.textContent = "Day " + (index + 1);
+    dayBox.appendChild(heading);
+
+    day.activities.forEach(activity => {
+      stopCount++;
+      const stop = document.createElement("div");
+      stop.className = "stop";
+      const time = document.createElement("span");
+      time.className = "time";
+      time.textContent = activity[0];
+      const details = document.createElement("div");
+      const title = document.createElement("strong");
+      title.textContent = activity[1];
+      const description = document.createElement("small");
+      description.textContent = activity[2];
+      details.append(title, description);
+
+      const map = document.createElement("a");
+      map.className = "map";
+      map.textContent = "View map ↗";
+      map.href = "https://www.google.com/maps/search/?api=1&query=" +
+        encodeURIComponent(activity[1] + " " + destination);
+      map.target = "_blank";
+      stop.append(time, details, map);
+      dayBox.appendChild(stop);
+    });
+    output.appendChild(dayBox);
+  });
+
+  $("status").textContent = destination.toUpperCase();
+  $("summary").hidden = false;
+  $("sumDestination").textContent = destination;
+  $("sumDays").textContent = trip.length + " days";
+  $("sumStops").textContent = stopCount;
+}
+
+// Adds the entered costs, extra buffer and divides by travellers.
+function calculateBudget() {
+  let subtotal = 0;
+  document.querySelectorAll(".cost").forEach(input => {
+    subtotal += Math.max(0, Number(input.value) || 0);
+  });
+  const travellers = Math.max(1, Number($("travellers").value) || 1);
+  const buffer = Math.max(0, Number($("buffer").value) || 0);
+  const total = Math.round(subtotal * (1 + buffer / 100));
+  const format = amount => new Intl.NumberFormat("en-IN", {
+    style: "currency", currency: "INR", maximumFractionDigits: 0
+  }).format(amount);
+
+  $("total").textContent = format(total);
+  $("perPerson").textContent = format(total / travellers);
+}
+
+// Saves the trip in this browser using localStorage.
+function saveTrip() {
+  if (trip.length === 0) {
+    showMessage("Generate a trip before saving.");
+    return;
+  }
+  const data = {
+    destination: $("destination").value,
+    days: $("days").value,
+    style: $("style").value,
+    trip: trip
+  };
+  localStorage.setItem("wayfarerTrip", JSON.stringify(data));
+  showMessage("Trip saved in this browser.");
+}
+
+// Restores a saved trip when the page is opened again.
+function loadTrip() {
+  const saved = localStorage.getItem("wayfarerTrip");
+  if (!saved) return;
+  const data = JSON.parse(saved);
+  $("destination").value = data.destination;
+  $("days").value = data.days;
+  $("style").value = data.style;
+  trip = data.trip;
+  displayPlan(data.destination);
+}
+
+function clearTrip() {
+  trip = [];
+  $("output").className = "empty";
+  $("output").innerHTML = "🧭<br><strong>Your trip starts with an idea.</strong><p>Enter your destination and click Generate plan.</p>";
+  $("summary").hidden = true;
+  $("status").textContent = "NOT CREATED";
+  localStorage.removeItem("wayfarerTrip");
+  showMessage("Trip cleared.");
+}
+
+$("generate").addEventListener("click", generatePlan);
+$("save").addEventListener("click", saveTrip);
+$("clear").addEventListener("click", clearTrip);
+document.querySelectorAll(".cost, #travellers, #buffer").forEach(input =>
+  input.addEventListener("input", calculateBudget)
+);
+
+calculateBudget();
+try { loadTrip(); } catch (error) { localStorage.removeItem("wayfarerTrip"); }
+</script>
+</body>
+</html>
